@@ -32,9 +32,9 @@ public class FGPlayer {
                     //socket.connect(new InetSocketAddress(serverAdds, port),15*1000);
                     //outStream = socket.getOutputStream();
 
-                    //Log.i("TAG","Connected!");
+                    //Log.i("TAG","in run");
 
-                    socket = new Socket("172.18.59.153", 5412);
+                    socket = new Socket(ip, port);
 
                     Log.i("TAG","Before Connect");
                     out = new PrintWriter(socket.getOutputStream(), true);
