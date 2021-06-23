@@ -13,26 +13,26 @@ import com.example.flightgearapp.view_model.ViewModel;
 
 public class Joystick extends View {
 
-    private int outerCircleRadius;
-    private double outerCircleCenterX;
-    private double outerCircleCenterY;
-    private double innerCircleCenterX;
-    private double innerCircleCenterY;
-    private int actualCenterX;
-    private int actualCenterY;
-    private boolean flag;
-    private double distance;
+    private int bigRadius;
+    private double bigCenterX;
+    private double bigCenterY;
+    private double smallCenterX;
+    private double smallCenterY;
+    private int width;
+    private int height;
+    private boolean initFlag;
+    private double dist;
     private boolean isPressed;
-    private double tempX;
-    private double tempY;
+    private double tmpX;
+    private double tmpY;
     private ViewModel vm;
 
     public Joystick(Context context) {
         super(context);
         setOnTouchListener(this);
-        actualCenterX = getWidth();
-        actualCenterY = getHeight();
-        flag = true;
+        width = getWidth();
+        height = getHeight();
+        initFlag = true;
 
     }
 
@@ -42,16 +42,16 @@ public class Joystick extends View {
 
     public Joystick(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        actualCenterX = getWidth();
-        actualCenterY = getHeight();
-        flag = true;
+        width = getWidth();
+        height = getHeight();
+        initFlag = true;
     }
 
     public Joystick(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        actualCenterX = getWidth();
-        actualCenterY = getHeight();
-        flag = true;
+        width = getWidth();
+        height = getHeight();
+        initFlag = true;
     }
 
     public void setVM(ViewModel vm){
@@ -62,95 +62,86 @@ public class Joystick extends View {
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (flag) {
-            actualCenterX = getWidth();
-            actualCenterY = getHeight();
-            Log.i("TAG", actualCenterX+"");
-            Log.i("TAG", actualCenterY+"");
-            innerCircleCenterX = getWidth();
-            innerCircleCenterY = getHeight();
-            outerCircleRadius = 220;
-            outerCircleCenterX = actualCenterX / 2;
-            outerCircleCenterY = actualCenterY / 2;
-            flag = false;
+        if (initFlag) {
+            width = getWidth();
+            height = getHeight();
+            //Log.i("TAG", width+"");
+            //Log.i("TAG", height+"");
+            smallCenterX = getWidth();
+            smallCenterY = getHeight();
+            bigRadius = 220;
+            bigCenterX = width / 2;
+            bigCenterY = height / 2;
+            initFlag = false;
         }
         Paint paint = new Paint();
-        paint.setARGB(255, 255, 213, 204);
-        canvas.drawCircle(actualCenterX / 2, actualCenterY / 2, outerCircleRadius, paint);
+        paint.setARGB(255, 27, 28, 24);
+        canvas.drawCircle(width / 2, height / 2, bigRadius, paint);
         Paint paint2 = new Paint();
-        paint2.setARGB(255, 255, 100, 150);
-        canvas.drawCircle((int)innerCircleCenterX / 2, (int)innerCircleCenterY / 2, 100, paint2);
+        paint2.setARGB(255, 151, 156, 168);
+        canvas.drawCircle((int)smallCenterX / 2, (int)smallCenterY / 2, 100, paint2);
         invalidate();
     }
 
     public boolean isPressed(double touchedPosX, double touchedPosY){
-        distance = Math.sqrt(Math.pow(outerCircleCenterX-touchedPosX, 2)+Math.pow(outerCircleCenterY-touchedPosY,2));
-        return distance<outerCircleRadius;
+        dist = Math.sqrt(Math.pow(bigCenterX-touchedPosX, 2)+Math.pow(bigCenterY-touchedPosY,2));
+        return dist<bigRadius;
     }
 
-    public void setIsPressed(boolean bool){
-        isPressed = bool;
+    public void setIsPressed(boolean isPressed){
+        this.isPressed = isPressed;
     }
 
     public boolean getIsPressed(){
         return this.isPressed;
     }
 
-    public void resetActurator(){
-        innerCircleCenterX = actualCenterX;
-        innerCircleCenterY = actualCenterY;
+    public void resetSmallCircle(){
+        smallCenterX = width;
+        smallCenterY = height;
         //Log.i("TAG", "Middle X:    "+innerCircleCenterX);
         //Log.i("TAG", "Middle Y:    "+innerCircleCenterY);
     }
 
-    public void setActurator(double touchedPosX, double touchedPosY){
-        double deltaX = touchedPosX-outerCircleCenterX;
-        double deltaY = touchedPosY-outerCircleCenterY;
-        double deltaDist = Math.sqrt(Math.pow(deltaX,2)+Math.pow(deltaY,2));
-        if(deltaDist<(outerCircleRadius)){
-            //tempX = deltaX/outerCircleCenterX;
-            //tempY = deltaY/outerCircleCenterY;
-            //update();
-            update(touchedPosX, touchedPosY);
+    public void setSmallCircle(double touchedPosX, double touchedPosY){
+        double distX = touchedPosX-bigCenterX;
+        double distY = touchedPosY-bigCenterY;
+        double dist = Math.sqrt(Math.pow(distX,2)+Math.pow(distY,2));
+        if(dist<(bigRadius)){
+            updateData(touchedPosX, touchedPosY);
         }
         else {
-            //double dx = deltaX*(deltaDist-outerCircleRadius)/deltaDist;
-            //double dy = deltaY*(deltaDist-outerCircleRadius)/deltaDist;
-            //update(dx,dy);
-            tempX = deltaX/deltaDist;
-            tempY = deltaY/deltaDist;
-            update();
+            tmpX = distX/dist;
+            tmpY = distY/dist;
+            updateData();
         }
 
     }
 
-    public void update(double x, double y){
-        innerCircleCenterX = x+outerCircleCenterX;
-        innerCircleCenterY = y+outerCircleCenterY;
-        vm.setAileron(calculateChange(innerCircleCenterX));
-        vm.setElevator(-1*calculateChange(innerCircleCenterY));
-        Log.i("TAG", "X:    "+calculateChange(innerCircleCenterX));
-        Log.i("TAG", "Y:    "+(-1*calculateChange(innerCircleCenterY)));
-        //vm.setaileron(innerCircleCenterX);
-        //vm.setElevator(innerCircleCenterY);
+    public void updateData(double x, double y){
+        smallCenterX = x+bigCenterX;
+        smallCenterY = y+bigCenterY;
+        vm.setDataAileron(calculatePosition(smallCenterX));
+        vm.setDataElevator(-1*calculatePosition(smallCenterY));
+        //Log.i("TAG", "X:    "+calculatePosition(smallCenterX));
+        //Log.i("TAG", "Y:    "+(-1*calculatePosition(smallCenterY)));
+
 
 
     }
 
-    public void update(){
-        innerCircleCenterX = outerCircleCenterX+tempX*outerCircleRadius+actualCenterX / 2;
-        innerCircleCenterY = outerCircleCenterY+tempY*outerCircleRadius+actualCenterX / 2;
-        vm.setAileron(calculateChange(innerCircleCenterX));
-        vm.setElevator(calculateChange(innerCircleCenterY));
+    public void updateData(){
+        smallCenterX = bigCenterX+tmpX*bigRadius+width / 2;
+        smallCenterY = bigCenterY+tmpY*bigRadius+width / 2;
+        vm.setDataAileron(calculatePosition(smallCenterX));
+        vm.setDataElevator(calculatePosition(smallCenterY));
         //Log.i("TAG", "X:    "+x+"    " +calculateChange(x));
         //Log.i("TAG", "Y:    "+y+"   "+ calculateChange(y));
-        //vm.setaileron(innerCircleCenterX);
-        //vm.setElevator(innerCircleCenterY);
     }
 
-    public double calculateChange(double touchedPos){
+    public double calculatePosition(double touchedPosition){
         //Log.i("TAG", "change:    "+touchedPos+"   "+ (touchedPos-actualCenterX)/outerCircleRadius);
-        return (touchedPos-actualCenterX)/outerCircleRadius;
+        return (touchedPosition-width)/bigRadius;
     }
 
 }
@@ -158,36 +149,3 @@ public class Joystick extends View {
 
 
 
-
-/*
-
-app:layout_constraintVertical_bias="0.714"
-app:layout_constraintHorizontal_bias="0.666"
-<!--
-    <com.example.flightgearapp.views.Joystick
-        android:id="@+id/Joystick"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-    />
-
-            android:id="@+id/Joystick"
-        android:layout_width="242dp"
-        android:layout_height="240dp"
-        android:orientation="vertical"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="113dp"
-        tools:layout_editor_absoluteY="279dp" />
-
-    <com.example.fgjoystick.view.Joystick
-        android:id="@+id/joystick"
-        android:layout_width="242dp"
-        android:layout_height="240dp"
-        android:orientation="vertical"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="113dp"
-        tools:layout_editor_absoluteY="279dp" />
-
-        =====
-
-    -->
- */

@@ -8,30 +8,20 @@ public class ViewModel {
 
     private FGPlayer model;
 
-    public ViewModel(FGPlayer model){
-            this.model = model;
+    public ViewModel(FGPlayer fgPlayer){
+            this.model = fgPlayer;
         }
 
-        public void setAileron(double innerCircleCenterX){
-            model.setAileron(innerCircleCenterX);
-
-        }
-
-        public void setElevator(double innerCircleCenterY){
-            model.setElevator(innerCircleCenterY);
+        public void setDataAileron(double smallCircleCenterX){
+            model.setDataAileron(smallCircleCenterX);
 
         }
 
-
-        public void setRudder(double data){
-            model.setRudder(data);
-
-        }
-
-        public void setThrottle(double data){
-            model.setThrottle(data);
+        public void setDataElevator(double smallCircleCenterY){
+            model.setDataElevator(smallCircleCenterY);
 
         }
+
 
         public void rudderSetting( SeekBar rudder){
             model.rudderSettings(rudder);
@@ -41,8 +31,8 @@ public class ViewModel {
             model.throttleSettings(throttle);
         }
 
-        public void connectToSocket(String ip, int port) throws InterruptedException {
-            model.connectToSocket(ip, port);
+        public void connectToSocket(String myIP, int myPort) throws InterruptedException {
+            model.connectToSocket(myIP, myPort);
         }
     }
 

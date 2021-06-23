@@ -4,54 +4,40 @@ import android.util.Log;
 import android.widget.SeekBar;
 
 import java.io.IOException;
-import java.io.OutputStream;
+//import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class FGPlayer {
-    private Socket socket;
+    private Socket mySocket;
     private PrintWriter out;
-    private ExecutorService executor; // = Executors.newSingleThreadExecutor();
-    private OutputStream outStream;
+    private ExecutorService executor;
+    //private OutputStream outStream;
 
     public FGPlayer(){
         this.executor = Executors.newSingleThreadExecutor();
     }
 
     public void connectToSocket(String ip, int port) {
-        executor.execute( new Runnable() {
-            @Override
-            public void run() {
-                try {
-                   // socket = new Socket(ip, port);
-                    //InetAddress serverAdds = InetAddress.getByName(ip);
-                    //socket = new Socket();
-                    //Wait until the connection are done.
-                    //socket.connect(new InetSocketAddress(serverAdds, port),15*1000);
-                    //outStream = socket.getOutputStream();
-
-                    //Log.i("TAG","in run");
-
-                    socket = new Socket(ip, port);
-
-                    Log.i("TAG","Before Connect");
-                    out = new PrintWriter(socket.getOutputStream(), true);
-                    Log.i("TAG","After Connect");
-                } catch (IOException e) {
-                    Log.i("TAG","in catch FGP");
-                    e.printStackTrace();
-                }
+        executor.execute(() -> {
+            try {
+                mySocket = new Socket(ip, port);
+                Log.i("TAG","Before Connect");
+                out = new PrintWriter(mySocket.getOutputStream(), true);
+                Log.i("TAG","After Connect");
+            } catch (IOException e) {
+                Log.i("TAG","in catch FGP");
+                e.printStackTrace();
             }
         });
     }
 
-    public void setThrottle(double data){
+    public void setDataThrottle(double data){
         executor.execute(new Runnable() {
             @Override
             public void run() {
-
                 out.print("set /controls/engines/current-engine/throttle " + data + "\r\n");
                 //Log.i("TAG","throttle " + data + "\n");
                 out.flush();
@@ -59,7 +45,7 @@ public class FGPlayer {
         });
     }
 
-    public void setAileron(double data){
+    public void setDataAileron(double data){
         executor.execute( new Runnable() {
             @Override
             public void run() {
@@ -70,7 +56,7 @@ public class FGPlayer {
         });
     }
 
-    public void setRudder(double data){
+    public void setDataRudder(double data){
         executor.execute( new Runnable() {
             @Override
             public void run() {
@@ -83,7 +69,7 @@ public class FGPlayer {
 
     }
 
-    public void setElevator(double data){
+    public void setDataElevator(double data){
         executor.execute( new Runnable() {
             @Override
             public void run() {
@@ -100,7 +86,7 @@ public class FGPlayer {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 double result = (double)progress/100;
-                setThrottle(result);
+                setDataThrottle(result);
             }
 
             @Override
@@ -121,7 +107,7 @@ public class FGPlayer {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 double result = (double)(progress-100)/100;
-                setRudder(result);
+                setDataRudder(result);
             }
 
             @Override

@@ -15,20 +15,17 @@ import com.example.flightgearapp.model.FGPlayer;
 import com.example.flightgearapp.view_model.ViewModel;
 
 public class MainActivity extends AppCompatActivity {
-
-    private Joystick joystick;
+    private ViewModel vm;
     private FGPlayer model;
+    private Joystick joystick;
     private SeekBar throttle;
     private SeekBar rudder;
-    private ViewModel vm;
+
 
     private View.OnTouchListener handleTouch = new View.OnTouchListener() {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-
-            int x = (int) event.getX();
-            int y = (int) event.getY();
 
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
@@ -38,14 +35,12 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 case MotionEvent.ACTION_MOVE:
                     if (joystick.getIsPressed()) {
-                        joystick.setActurator((int) event.getX(), (int) event.getY());
-                        //Log.i("TAG", event.getX()+"");
-                        //Log.i("TAG", event.getY()+"");
+                        joystick.setSmallCircle((int) event.getX(), (int) event.getY());
                     }
                     return true;
                 case MotionEvent.ACTION_UP:
                     joystick.setIsPressed(false);
-                    joystick.resetActurator();
+                    joystick.resetSmallCircle();
                     return true;
             }
             return MainActivity.super.onTouchEvent(event);
@@ -58,31 +53,31 @@ public class MainActivity extends AppCompatActivity {
         this.model =  new FGPlayer();
         this.vm = new ViewModel(this.model);
         setContentView(R.layout.activity_main);
-        //Joystick joystick = (Joystick) findViewById((R.id.Joystick));
-        joystick = (Joystick) findViewById(R.id.Joystick);
+        joystick = findViewById(R.id.Joystick);
         joystick.setVM(vm);
-        throttle = (SeekBar) findViewById(R.id.throttle2);
-        rudder = (SeekBar) findViewById(R.id.rudder);
+        throttle = findViewById(R.id.throttle2);
+        rudder = findViewById(R.id.rudder);
         joystick.setOnTouchListener(handleTouch);
-        vm.throttleSetting(throttle);
         vm.rudderSetting(rudder);
+        vm.throttleSetting(throttle);
+
 
         // Connect
-        Button ConnectBtn = (Button) findViewById(R.id.ConnectBtn);
-        ConnectBtn.setOnClickListener(new View.OnClickListener() {
+        Button ConnectButtton = findViewById(R.id.ConnectBtn);
+        ConnectButtton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("TAG", "in onClick");
-                EditText IPeditText = (EditText) findViewById(R.id.ipEditText);
-                EditText PortEditText = (EditText) findViewById(R.id.PortEditText);
+               // Log.i("TAG", "in onClick");
+                EditText myIPText = (EditText) findViewById(R.id.ipEditText);
+                EditText myPortText = (EditText) findViewById(R.id.PortEditText);
 
-                String IP = IPeditText.getText().toString();
-                int Port = Integer.parseInt(PortEditText.getText().toString());
+                String myIP = myIPText.getText().toString();
+                int myPort = Integer.parseInt(myPortText.getText().toString());
                 try {
-                    vm.connectToSocket(IP, Port);
-                    Log.i("TAG", "in connect");
+                    vm.connectToSocket(myIP, myPort);
+                 //   Log.i("TAG", "in connect");
                 } catch (InterruptedException e) {
-                    Log.i("TAG", "in catch");
+                   // Log.i("TAG", "in catch");
                     e.printStackTrace();
                 }
             }
